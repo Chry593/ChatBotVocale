@@ -21,17 +21,10 @@
          "risposta": "semplice,basta scrivere quit"
       },
       {
-         "domanda": "che ore sono?",
-         "risposta": "mi dispiace ma non posso fornire informazioni in tempo reale, prova a vedere sul tuo dispositivo o se no crea te un orologio tramite pytho!"
-      },
-      {
          "domanda": "che tempo fa?",
          "risposta": "scusa ma non posso fornire informazioni in tempo reale. Per ottenre le condizioni meteorologiche controlla su siti di meteo"
       },
-      {
-         "domanda": "2+2",
-         "risposta": "4"
-      },
+
       {
          "domanda": "come si printa in python?",
          "risposta": "per mostrare qualcosa a schermo basta scrivere print(\"Ciao\")"
@@ -51,6 +44,74 @@
       {
          "domanda": "15 + 18 quanto fa",
          "risposta": "trentatre"
-      }
+      },
+      {
+         "domanda": "cosa puoi fare",
+         "risposta": "Posso rispondere alle tue domande, aiutarti con ricerche e molto altro."
+     },
+     {
+         "domanda": "chi ha inventato la lampadina",
+         "risposta": "La lampadina è stata perfezionata da Thomas Edison."
+     },
+     {
+         "domanda": "che cos'è l'intelligenza artificiale",
+         "risposta": "L'intelligenza artificiale \u00e8  una branca dell'informatica che si occupa della creazione di macchine capaci di eseguire compiti che richiederebbero intelligenza umana."
+     },
+     {
+         "domanda": "quanti continenti ci sono",
+         "risposta": "Ci sono sette continenti: Africa, Antartide, Asia, Europa, Nord America, Oceania e Sud America."
+     },
+     {
+         "domanda": "che cos'è un algoritmo",
+         "risposta": "Un algoritmo \u00e8  una sequenza di istruzioni utilizzate per risolvere un problema o per compiere un'operazione."
+     },
+     {
+         "domanda": "quale è la capitale dell'Italia",
+         "risposta": "La capitale dell'Italia \u00e8  Roma."
+     },
+     {
+         "domanda": "come funziona un motore a combustione interna",
+         "risposta": "Un motore a combustione interna funziona bruciando carburante all'interno di una camera di combustione, dove l'espansione dei gas prodotti genera movimento."
+     },
+     {
+         "domanda": "chi è il fondatore di Microsoft",
+         "risposta": "Microsoft \u00e8  stata fondata da Bill Gates e Paul Allen."
+     },
+     {
+         "domanda": "quale è la velocità della luce",
+         "risposta": "La velocità della luce nel vuoto \u00e8  di circa 299.792.458 metri al secondo."
+     },
+     {
+         "domanda": "cos'è la gravità",
+         "risposta": "La gravità \u00e8  una forza naturale che attira due corpi l'uno verso l'altro, come ad esempio la forza che ci tiene ancorati alla Terra."
+     },
+     {
+         "domanda": "quando è nato Leonardo da Vinci",
+         "risposta": "Leonardo da Vinci \u00e8  nato il 15 aprile 1452."
+     },
+     {
+         "domanda": "come funziona internet",
+         "risposta": "Internet \u00e8  una rete globale di computer interconnessi che comunicano tra loro attraverso protocolli standard come il TCP/IP."
+     },
+     {
+         "domanda": "cosa è la blockchain",
+         "risposta": "La blockchain \u00e8  una tecnologia di registro distribuito che garantisce la sicurezza e la trasparenza delle transazioni digitali."
+     },
+     {
+         "domanda": "chi è stato il primo uomo sulla luna",
+         "risposta": "Il primo uomo a mettere piede sulla Luna \u00e8  stato Neil Armstrong nel 1969."
+     },
+     {
+         "domanda": "come posso proteggere la mia privacy online",
+         "risposta": "Puoi proteggere la tua privacy online utilizzando password forti, evitando di condividere informazioni personali e usando una VPN."
+     },
+     {
+         "domanda": "cos'è un virus informatico",
+         "risposta": "Un virus informatico \u00e8  un software dannoso progettato per infettare e danneggiare i sistemi informatici."
+     },
+     {
+         "domanda": "che cos'è un sistema operativo",
+         "risposta": "Un sistema operativo \u00e8  il software che gestisce l'hardware di un computer e fornisce servizi per i programmi applicativi."
+     }
    ]
 }
