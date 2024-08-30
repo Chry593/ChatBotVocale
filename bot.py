@@ -40,7 +40,45 @@ def presentazione(testo: str):
     for lettera in testo:
         print(lettera,end="",flush=True)
         time.sleep(0.03) 
-   
+                  
+# funzioni 
+def ricerca_amazon():
+    engine.say("Cosa vuoi che ti cerchi?")
+    print("Jarvis: Cosa vuoi che ti cerchi?")
+    engine.runAndWait()
+    with sr.Microphone() as source:
+        print("\nParla: ")
+        audio = sr.Recognizer().listen(source,phrase_time_limit=4)
+        try:
+            testo = sr.Recognizer().recognize_google(audio, language = "it-IT")
+            print(f"\nTu: {testo}")
+            risultato = am.cerca_oggetto(testo)
+            engine.say(f"Ho trovato {risultato} risultati, per il prodotto {testo}, controlla il file nella cartella risultato")
+            print(f"Jarvis: Ho trovato {risultato} risultati, per il prodotto {testo}, controlla il file nella cartella risultato")
+            engine.runAndWait
+        except sr.UnknownValueError:
+            engine.say("Mi dispiace ma non ho capito quello che hai detto")
+            engine.runAndWait()
+        except sr.RequestError:
+            engine.say("Errore nella richiesta al servizio di riconoscimento vocale")
+            engine.runAndWait()
+            
+def ore():
+    ora = datetime.now().strftime("%H:%M:%S")
+    engine.say(f"Sono le {ora}")
+    print(f"\nJarvis: Sono le {ora}")
+    engine.runAndWait()
+            
+def apri_genshin(): # o qualsivoglia programma, basta specificare il path
+    import subprocess
+    engine.say("Ok apro Genshin Impact")
+    print("Jarvis: Ok apro Genshin Impact")
+    engine.runAndWait()
+    subprocess.Popen(["path_file"])
+    engine.say("Programma aperto, buona sessione di gioco!")
+    print("Jarvis: Programma aperto, buona sessione di gioco!")   
+    engine.runAndWait() 
+
 
 # sezione preparazione dati machine learning
 def prepara_dati(memoria):
@@ -79,9 +117,8 @@ def bot():
     model = addestramento(domande,risposte)
     
     #inizializzo bot
-    engine = inizializza_bot()
-    engine.say("Ciao sono Jarvis,un ChatBot, come posso aiutarti? Se vuoi uscire di' esci\n")
-    print("Ciao sono Jarvis, come posso aiutarti? Se vuoi uscire di' esci")
+    engine.say("Ciao , come posso aiutarti? Se vuoi uscire di' esci\n")
+    print("Ciao , come posso aiutarti? Se vuoi uscire di' esci")
     engine.runAndWait()
     
     
@@ -90,13 +127,13 @@ def bot():
         
         with sr.Microphone() as source:
             print("Parla: ")
-            audio = riconoscimento_vocale.listen(source, phrase_time_limit=2)
+            audio = riconoscimento_vocale.listen(source, phrase_time_limit=4)
         
         try:
             testo = riconoscimento_vocale.recognize_google(audio, language="it-IT")
             print(f"\nTu: {testo}")
         except sr.UnknownValueError:
-            engine.say("Non riesco a capire l'audio")
+            engine.say("Mi dispiace ma non ho capito quello che hai detto")
             engine.runAndWait()
             continue
         except sr.RequestError:
@@ -110,46 +147,28 @@ def bot():
         
         # comandi personalizzati, es ore, ricerca su amazon, ecc
         if testo.lower() == "che ore sono":
-            ora = datetime.now().strftime("%H:%M:%S")
-            engine.say(f"Sono le {ora}")
-            print(f"\nJarvis: Sono le {ora}")
-            engine.runAndWait()
-            continue
+            ore()
+            break
         #ricerca amazon
         elif testo.lower() in ["fai una ricerca su amazon","cerca su amazon"]:
-            engine.say("Cosa vuoi che ti cerchi?")
-            print("Jarvis: Cosa vuoi che ti cerchi?")
-            engine.runAndWait()
+            ricerca_amazon()
+            break
+        elif testo.lower() in ["apri genshin","apri genshin impact","genshin","genshin impact"]:
+            apri_genshin()
+            break
             
-            with sr.Microphone() as source:
-                print("\nParla: ")
-                audio = riconoscimento_vocale.listen(source)
-            
-            try:
-                testo = riconoscimento_vocale.recognize_google(audio, language = "it-IT")
-                print(f"\nTu: {testo}")
-                risultato = am.cerca_oggetto(testo)
-                engine.say(f"Ho trovato {risultato} risultati, per il prodotto {testo}, controlla il file nella cartella risultato")
-                print(f"Jarvis: Ho trovato {risultato} risultati, per il prodotto {testo}, controlla il file nella cartella risultato")
-                engine.runAndWait
-                continue
-            except sr.UnknownValueError:
-                engine.say("Non riesco a capire l'audio")
-                engine.runAndWait()
-                continue
-            except sr.RequestError:
-                engine.say("Errore nella richiesta al servizio di riconoscimento vocale")
-                engine.runAndWait()
-                continue
 
         
         #risposta tramite predict e json
         risposta = predict_risposta(model,testo.lower())
+
         # bot risponde
         if risposta:
-            engine.say(f"{risposta}")
+            engine.say(risposta)
             print(f"Jarvis: {risposta}\n")
             engine.runAndWait()
+            # stop
+            break
                
         else: #nel caso non sa come rispondere gli andiamo a "dire" la risposta
             engine.say("Scusa ma non so la risposta, se me la dicessi  potrei aiutarti in futuro, dimmi la risposta o dimmi 'no'")
@@ -158,12 +177,12 @@ def bot():
             print("Parla: ")
             
             with sr.Microphone() as source:
-                audio = riconoscimento_vocale.listen(source,phrase_time_limit=2)
+                audio = riconoscimento_vocale.listen(source,phrase_time_limit=4)
             try:
                 nuova_risposta = riconoscimento_vocale.recognize_google(audio)
                 print(f"\nTu: {nuova_risposta}")
             except sr.UnknownValueError:
-                engine.say("Non riesco a capire l'audio")
+                engine.say("Mi dispiace ma non ho capito quello che hai detto")
                 engine.runAndWait()
                 continue
             except sr.RequestError:
@@ -184,9 +203,13 @@ def bot():
                 #riaddestra modello
                 domande, risposte = prepara_dati(memory)
                 model = addestramento(domande,risposte)
+                #stop 
+                break
+                
 
     
     engine.say("Ciao alla prossima!")
+    print("Jarvis: Ciao alla prossima!")
     engine.runAndWait()
      
             
@@ -194,4 +217,18 @@ def bot():
 
         
 if __name__ == "__main__":
-    bot()
+    
+    engine = inizializza_bot()
+    while True:
+        with sr.Microphone() as source:
+            print("Parla: ")
+            audio = sr.Recognizer().listen(source, phrase_time_limit=4)
+        try:
+            testo = sr.Recognizer().recognize_google(audio, language="it-IT")
+            print(f"\nTu: {testo}")
+            if "jarvis" in testo.lower():
+                bot()
+        except sr.UnknownValueError:
+            continue
+        except sr.RequestError:
+            continue
