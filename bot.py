@@ -2,8 +2,13 @@ import speech_recognition as sr
 import pyttsx3
 import json,time
 from datetime import datetime
-from difflib import get_close_matches
 from programmi_appoggio import amazon_scraping as am
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.pipeline import make_pipeline
+
+
+
 
 
 def inizializza_bot():
@@ -30,41 +35,53 @@ def save_new_questions(data: str, path: str):
 
 
 
-def best_answer(user_quest:str ,lista_domande: list[str] ) -> str|None:
-    "crea una lista con la risposta che si avvicina di più alla domanda"
-    lista = get_close_matches(user_quest, lista_domande, n=1, cutoff=0.7) #70% 
-    if lista:
-        return lista[0]#primo elemento trovato
-    return None
-
-
-
-def answer(domanda: str, data: dict) -> str|None:
-    "cerca la risposta"
-    for d in data["domande"]:
-        if d["domanda"] == domanda:
-            return  d["risposta"]
-    return None
-
 def presentazione(testo: str):
     "stampa lettera per lettera con un ritardo di 5 millisecondi, pura estetica"
     for lettera in testo:
         print(lettera,end="",flush=True)
         time.sleep(0.03) 
    
-def ascolta_voce():
-    return 0
+
+# sezione preparazione dati machine learning
+def prepara_dati(memoria):
+    domande = [item["domanda"] for item in memoria["domande"]]
+    risposte = [item["risposta"] for item in memoria["domande"]]
+    return domande, risposte
+
+def addestramento(domande,risposte):
+    model = make_pipeline(TfidfVectorizer(),MultinomialNB())
+    model.fit(domande,risposte)
+    return model
+
+def predict_risposta(model,nuova_domanda):
+    probabilita = model.predict_proba([nuova_domanda])
+    risposta = model.predict([nuova_domanda])
+    
+    probabilita_predict = probabilita[0][model.classes_ == risposta[0]]
+    soglia = 0.05
+    if probabilita_predict >= soglia:
+        return risposta[0]
+    else:
+        return ""
+
+
+
+
 
 def bot():
     
     riconoscimento_vocale = sr.Recognizer()
+    
+        
     #carico memoria
     memory = load_memory_bot("botVocale/memoria/memoria.json")
+    domande, risposte = prepara_dati(memory)
+    model = addestramento(domande,risposte)
     
     #inizializzo bot
     engine = inizializza_bot()
     engine.say("Ciao sono Jarvis,un ChatBot, come posso aiutarti? Se vuoi uscire di' esci\n")
-    print("Ciao sono Jarvis,un ChatBot, come posso aiutarti? Se vuoi uscire di' esci")
+    print("Ciao sono Jarvis, come posso aiutarti? Se vuoi uscire di' esci")
     engine.runAndWait()
     
     
@@ -73,10 +90,10 @@ def bot():
         
         with sr.Microphone() as source:
             print("Parla: ")
-            audio = riconoscimento_vocale.listen(source)
+            audio = riconoscimento_vocale.listen(source, phrase_time_limit=2)
         
         try:
-            testo = riconoscimento_vocale.recognize_google(audio, language = "it-IT")
+            testo = riconoscimento_vocale.recognize_google(audio, language="it-IT")
             print(f"\nTu: {testo}")
         except sr.UnknownValueError:
             engine.say("Non riesco a capire l'audio")
@@ -124,20 +141,16 @@ def bot():
                 engine.say("Errore nella richiesta al servizio di riconoscimento vocale")
                 engine.runAndWait()
                 continue
-                
-                
+
         
-        
-        #creazione lista risposte
-        lista_risposte = best_answer(testo,[domanda["domanda"] for domanda in memory["domande"]])
-            
-        #se la lista contiene qualcosa
-        if lista_risposte:
-            risposta = answer(lista_risposte,memory)
-            engine.say(f"{risposta}\n")
+        #risposta tramite predict e json
+        risposta = predict_risposta(model,testo.lower())
+        # bot risponde
+        if risposta:
+            engine.say(f"{risposta}")
             print(f"Jarvis: {risposta}\n")
             engine.runAndWait()
-                
+               
         else: #nel caso non sa come rispondere gli andiamo a "dire" la risposta
             engine.say("Scusa ma non so la risposta, se me la dicessi  potrei aiutarti in futuro, dimmi la risposta o dimmi 'no'")
             print("\nJarvis: Scusa ma non so la risposta, se me la dicessi  potrei aiutarti in futuro, dimmi la risposta o dimmi 'no'\n")
@@ -145,7 +158,7 @@ def bot():
             print("Parla: ")
             
             with sr.Microphone() as source:
-                audio = riconoscimento_vocale.listen(source)
+                audio = riconoscimento_vocale.listen(source,phrase_time_limit=2)
             try:
                 nuova_risposta = riconoscimento_vocale.recognize_google(audio)
                 print(f"\nTu: {nuova_risposta}")
@@ -167,6 +180,10 @@ def bot():
                 engine.say("Grazie! Ho imparato una nuova cosa")
                 print("Jarvis: Grazie! Ho imparato una nuova cosa")
                 engine.runAndWait()
+                
+                #riaddestra modello
+                domande, risposte = prepara_dati(memory)
+                model = addestramento(domande,risposte)
 
     
     engine.say("Ciao alla prossima!")
